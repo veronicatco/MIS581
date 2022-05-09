@@ -156,7 +156,7 @@ df.to_csv(os.path.join(path, 'one_layer_224x224_shift_flip.csv'))
 
 
 ```python
-files = {'history 1 layer 128x128 shift_both_flips.csv': '128x128 Pixels',
+files = {'layers1_shiftflip_128x128_ep1-90_history.csv': '128x128 Pixels',
          'one_layer_224x224_shift_flip.csv': '224x224 Pixels'
         }    
 single_plot(files, 'Baseline Model With Data Augmentation')
