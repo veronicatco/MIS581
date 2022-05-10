@@ -2,15 +2,16 @@
 ## Analyze Validation Accuracy During Neural Network Training
 * Veronica Thompson
 * Colorado State University Global
-* CSC 581: Capstone
+* MIS 581: Capstone
 * Dr. Orenthio Goodwin
-* 5/8/2022
+* 5/15/2022
 
 This notebook is used to evaluate performance of image classification neural networks on on Sorghum-100 dataset. Graphs are created to visualize training and validation accuracy obtained during neural network training.
 
 
 ```python
 import matplotlib.pyplot as plt
+import numpy as np
 import os
 import pandas as pd
 ```
@@ -142,7 +143,7 @@ side_by_side_plots(files, 'Baseline Model, 128x128 Pixel Images')
 
 
 ### Increased Image Size
-Increasing training images from 128x128 pixels to 224x224 pixels resulted in increased validation accuracy.
+Increasing training images from 128x128 pixels to 224x224 pixels did not result in increased validation accuracy.
 
 
 ```python
@@ -215,7 +216,7 @@ The pretrained VGG16 model also benefitted from larger training images. Data aug
 
 ```python
 files = {'history vgg16 128x128.csv': '128x128 Pixels',
-         'history vgg16 224x224 run2.csv': '224x224 Pixels'
+         'vgg16_224x224_ep1-50_history.csv': '224x224 Pixels'
         }
 single_plot(files, "Pre-trained VGG16 Model")
 ```
@@ -283,6 +284,186 @@ side_by_side_plots(files, 'ResNet50 with 224x224 Pixels')
 
     
 ![png](output_28_0.png)
+    
+
+
+### Table of Validation Accuracy
+
+
+```python
+files = [{'model': 'one_vgg_block', 'aug': 'no', 'size': '128x128',  
+          'file': 'history 1 layer 128x128 run2.csv'},
+         {'model': 'one_vgg_block', 'aug': 'no', 'size': '224x224',
+          'file': 'history 1 layer 224x224.csv'},
+         {'model': 'one_vgg_block', 'aug': 'yes', 'size': '128x128',  
+          'file': 'layers1_shiftflip_128x128_ep1-90_history.csv'},
+         {'model': 'one_vgg_block', 'aug': 'yes', 'size': '224x224',  
+          'file': 'one_layer_224x224_shift_flip.csv'},
+         {'model': 'three_vgg_blocks', 'aug': 'no', 'size': '128x128',  
+          'file': 'history 3 layers 128x128.csv'},
+         {'model': 'three_vgg_blocks', 'aug': 'yes', 'size': '128x128',  
+          'file': 'history 3 layer 128x128 shift_both_flips run2.csv'},
+         {'model': 'three_vgg_blocks', 'aug': 'yes', 'size': '224x224',  
+          'file': 'three_block_224x224_shift_flip.csv'},
+         {'model': 'vgg16', 'aug': 'no', 'size': '128x128',  
+          'file': 'history vgg16 128x128.csv'},
+         {'model': 'vgg16', 'aug': 'no', 'size': '224x224',  
+          'file': 'vgg16_224x224_ep1-50_history.csv'},
+         {'model': 'resnet50', 'aug': 'no', 'size': '128x128',  
+          'file': 'history resnet50 128x128 run2.csv'},
+         {'model': 'resnet50', 'aug': 'no', 'size': '224x224',  
+          'file': 'history resnet50 224x224.csv'},
+         {'model': 'resnet50', 'aug': 'yes', 'size': '224x224',  
+          'file': 'resnet50_shift_flip.csv'},
+        ]
+df = pd.DataFrame(files)
+
+df['val_accuracy'] = df.apply(lambda row : pd.read_csv(os.path.join(path, row['file']))['val_accuracy'].iloc[-1], axis=1)
+
+df.drop(columns=['file'], inplace=True)
+
+display(df)
+```
+
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>model</th>
+      <th>aug</th>
+      <th>size</th>
+      <th>val_accuracy</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>one_vgg_block</td>
+      <td>no</td>
+      <td>128x128</td>
+      <td>0.047161</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>one_vgg_block</td>
+      <td>no</td>
+      <td>224x224</td>
+      <td>0.037098</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>one_vgg_block</td>
+      <td>yes</td>
+      <td>128x128</td>
+      <td>0.359315</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>one_vgg_block</td>
+      <td>yes</td>
+      <td>224x224</td>
+      <td>0.285650</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>three_vgg_blocks</td>
+      <td>no</td>
+      <td>128x128</td>
+      <td>0.080054</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>three_vgg_blocks</td>
+      <td>yes</td>
+      <td>128x128</td>
+      <td>0.539501</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>three_vgg_blocks</td>
+      <td>yes</td>
+      <td>224x224</td>
+      <td>0.650146</td>
+    </tr>
+    <tr>
+      <th>7</th>
+      <td>vgg16</td>
+      <td>no</td>
+      <td>128x128</td>
+      <td>0.155215</td>
+    </tr>
+    <tr>
+      <th>8</th>
+      <td>vgg16</td>
+      <td>no</td>
+      <td>224x224</td>
+      <td>0.186979</td>
+    </tr>
+    <tr>
+      <th>9</th>
+      <td>resnet50</td>
+      <td>no</td>
+      <td>128x128</td>
+      <td>0.336337</td>
+    </tr>
+    <tr>
+      <th>10</th>
+      <td>resnet50</td>
+      <td>no</td>
+      <td>224x224</td>
+      <td>0.422618</td>
+    </tr>
+    <tr>
+      <th>11</th>
+      <td>resnet50</td>
+      <td>yes</td>
+      <td>224x224</td>
+      <td>0.449426</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+```python
+models = {'Baseline': 0,
+          '3 VGG Blocks\n224x224 pixels\nData Augmentation': 6,
+          'ResNet 50\n224x224 pixels': 11}
+labels = list(models.keys())
+vals = df.iloc[list(models.values())]['val_accuracy'].tolist()
+
+fig, ax = plt.subplots()
+ax.bar(x=labels, height=vals)
+ax.set_ylabel('% Accuracy')
+fig.suptitle('Validation Accuracy for Top Two Models', fontsize = 16)
+```
+
+
+
+
+    Text(0.5, 0.98, 'Validation Accuracy for Top Two Models')
+
+
+
+
+    
+![png](output_31_1.png)
     
 
 
